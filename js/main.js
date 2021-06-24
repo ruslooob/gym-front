@@ -1,13 +1,30 @@
-// fetch("http://localhost:8081/clients/	")
-// 	.then(res => res.json())
-// 	.then(data => console.log(data));
+let tbody = document.querySelector('tbody');
 
 
-fetch("http://localhost:8081/clients/")
-	.then(res => res.json())
-	.then(clients => {
-		for (client of clients) {
-			document.body.innerHTML += (JSON.stringify(client)) + '<br>';
-		}
-	});
+async function fetchData(url) {
+	return (await fetch(url)).json();
+}
+
+async function main() {
+	let getAllUsersURL = "http://localhost:8081/clients/";
+	// массив объектов
+	let users = await fetchData(getAllUsersURL);
+	for (user of users) {
+		let tr = document.createElement('tr');
+		let td1 = document.createElement('td');
+		let td2 = document.createElement('td');
+		let td3 = document.createElement('td');
+		td1.textContent = user.id;
+		td2.textContent = user.fullName;
+		td3.textContent = user.telNumber;
+		tr.appendChild(td1);
+		tr.appendChild(td2);
+		tr.appendChild(td3);
+		tbody.appendChild(tr);
+	}
+}
+
+main();
+
+
 
