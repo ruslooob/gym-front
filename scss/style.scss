@@ -1,11 +1,26 @@
+::selection {
+	background: orange;
+}
+
 table {
 	text-align: center;
+
+	th,
+	td {
+		padding: 5px;
+	}
 
 	th {
 		border: 2px solid #34495e;
 	}
 
-	td {
-		border: 2px solid #2c3e50;
+	tr {
+		&:hover {
+			background-color: lightgray;
+		}
+
+		td {
+			border: 2px solid #2c3e50;
+		}
 	}
 }
