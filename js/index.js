@@ -73,9 +73,9 @@ function createTR() {
 function showCreateCLientForm() {
 	wrapper.innerHTML =
 		'<form action="http://localhost:8081/clients/" method="POST" enctype="application/x-www-form-urlencoded">' +
-		'<input type="text" name="fullName">' +
-		'<input type="text" name="telNumber">' +
-		'<button type="submit">Создать</button>' +
+		'<input type="text" name="fullName" class="full-name-input">' +
+		'<input type="number" name="telNumber" class="tel-number-input">' +
+		'<button type="submit" class="sec-create-btn">Создать</button>' +
 		'</form>';
 }
 
