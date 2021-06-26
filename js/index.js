@@ -1,4 +1,5 @@
-const baseURL = 'http://localhost:8081/clients/';
+const baseBackURL = 'http://localhost:8081/clients/';
+const baseFrontURL = 'http://localhost:5500';
 const tbody = document.querySelector('tbody');
 const wrapper = document.querySelector('.wrapper');
 const createBtn = document.querySelector('.create-btn');
@@ -14,11 +15,12 @@ createBtn.addEventListener('click', showCreateCLientForm);
 
 async function showAllUsers() {
 	let users = await getAllUsers();
-	let i = 0;
+	let i = 1;
 	for (user of users) {
 		let tr = createTR();
 		tr.classList.toggle('row-' + i++);
 		tbody.appendChild(tr);
+		tr.addEventListener('click', showInfo);
 	}
 	initActionBtns();
 }
@@ -42,7 +44,7 @@ async function fetchData(url, methodName = 'GET') {
 
 async function getAllUsers() {
 	// массив объектов
-	return (await fetchData(baseURL));
+	return (await fetchData(baseBackURL));
 }
 
 function createTR() {
@@ -72,12 +74,14 @@ function createTR() {
 
 function showCreateCLientForm() {
 	wrapper.innerHTML =
-		'<form action="http://localhost:8081/clients/" method="POST" enctype="application/x-www-form-urlencoded">' +
-		'<input type="text" name="fullName" class="full-name-input">' +
-		'<input type="number" name="telNumber" class="tel-number-input">' +
-		'<button type="submit" class="sec-create-btn">Создать</button>' +
+		'<h1>Создание клиента</h1>' +
+		'<form action="http://localhost:8081/clients/" method="POST">' +
+		'<input type="text" name="fullName" autocomplete="off" class="full-name-input" placeholder="Полное имя">' +
+		'<input type="number" name="telNumber" autocomplete="off" class="tel-number-input" placeholder="Тел. номер">' +
+		'<button type="submit" class="btn sec-create-btn">Создать</button>' +
 		'</form>';
 }
+
 
 
 function backToMain() {
@@ -98,34 +102,47 @@ function backToMain() {
 	showAllUsers();
 }
 
-// async function modifyNumberInput() {
-// 	let usersCount = (await getAllUsers()).length;
-// 	numberInput.setAttribute('min', 1);
-// 	numberInput.setAttribute('max', usersCount);
-// 	console.log(numberInput);
-// }
-
-// function changeActionInForm(e) {
-// 	deleteForm.setAttribute('action', baseURL + e.target.value);
-// }
-
 async function deleteUser(e) {
-	let rowIndex = getRowIndex(e);
-	(await fetchData(baseURL + rowIndex, 'DELETE'));
+	// не даст сработать событию click на tr
+	e.stopPropagation();
+	let clientID = getIdByActionButton(e);
+	// удаление
+	await fetchData(baseBackURL + clientID, 'DELETE');
 }
 
 async function visit(e) {
-	let rowIndex = getRowIndex(e);
-	await fetchData(baseURL + rowIndex + '/prolong=30', 'PUT');
+	// не даст сработать событию click на tr
+	e.stopPropagation();
+	let clientID = getIdByActionButton(e);
+	await fetchData(baseBackURL + clientID + '/prolong=30', 'PUT');
 }
 
-function getRowIndex(e) {
+async function showInfo(e) {
+	let clientID = getIdByTD(e);
+	console.log(await fetchData(baseBackURL + clientID));
+}
+
+
+/* 
+	Возвращет id пользователя, 
+	с которым что-то хотят сделать 
+*/
+function getIdByActionButton(e) {
 	let actionBtn = e.target;
 	let actionButtons = actionBtn.parentElement;
 	let td = actionButtons.parentElement;
 	let tr = td.parentElement;
-	let trClassName = tr.className;
-	let lastSymbolInTrClassName = trClassName.slice(-1);
-	return lastSymbolInTrClassName;
+	let clientID = tr.querySelector('td').textContent;
+	return clientID;
 }
 
+/* 
+	Возвращает id пользователя 
+	вызывается при клике по ячейке таблицы
+*/
+function getIdByTD(e) {
+	let td = e.target;
+	let tr = td.parentElement;
+	let clientID = tr.querySelector('td').textContent;
+	return clientID;
+}

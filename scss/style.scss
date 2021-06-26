@@ -1,13 +1,13 @@
-::selection {
-	background: cyan;
-}
-
 body {
 	background: linear-gradient(135deg, rgb(129, 243, 80) 0%, rgb(3, 254, 219) 100%);
 }
 
 button {
 	outline: none !important;
+}
+
+input {
+	outline: none;
 }
 
 .wrapper {
@@ -33,6 +33,7 @@ table {
 	tr {
 		&:hover {
 			background: linear-gradient(375deg, rgb(28, 199, 208), rgb(46, 222, 152));
+			cursor: pointer;
 		}
 
 		td {
