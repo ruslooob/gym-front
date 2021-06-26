@@ -1,5 +1,21 @@
 ::selection {
-  background: orange;
+  background: cyan;
+}
+
+body {
+  background: linear-gradient(135deg, #81f350 0%, #03fedb 100%);
+}
+
+button {
+  outline: none !important;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 1100px;
+  margin: 0 auto;
 }
 
 table {
@@ -16,9 +32,40 @@ table th {
 }
 
 table tr:hover {
-  background-color: lightgray;
+  background: linear-gradient(375deg, #1cc7d0, #2ede98);
 }
 
 table tr td {
   border: 2px solid #2c3e50;
+}
+
+.btn {
+  background: linear-gradient(36deg, #0dd3ff, #0389ff, #1c79c0);
+  border-radius: 20px;
+  padding: 5px;
+  border: 2px solid black;
+  transition: background-image 0.2s linear;
+  transition: transform 0.2s linear;
+  margin-left: 10px;
+  color: white;
+}
+
+.btn:first-child {
+  margin-left: 0;
+}
+
+.btn:hover {
+  cursor: pointer;
+  background: linear-gradient(to right, #0069ff, #1633ff);
+  transform: scale(1.05);
+}
+
+.visit-btn {
+  padding: 5px 10px;
+  border-radius: 100%;
+}
+
+.create-btn {
+  margin-top: 10px;
+  border-radius: 5px;
 }
