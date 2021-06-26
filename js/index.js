@@ -3,15 +3,9 @@ const baseFrontURL = 'http://localhost:5500';
 const tbody = document.querySelector('tbody');
 const wrapper = document.querySelector('.wrapper');
 const createBtn = document.querySelector('.create-btn');
-let deleteBtns;
-let numberInput = document.querySelector('.number-input');
-
-
 
 document.addEventListener('DOMContentLoaded', showAllUsers);
 createBtn.addEventListener('click', showCreateCLientForm);
-
-
 
 async function showAllUsers() {
 	let users = await getAllUsers();
@@ -34,6 +28,10 @@ function initActionBtns() {
 	visitBtns.forEach(btn => {
 		btn.addEventListener('click', visit);
 	})
+	prolongBtns = document.querySelectorAll('.prolong-btn');
+	prolongBtns.forEach(btn => {
+		btn.addEventListener('click', prolong);
+	})
 }
 
 async function fetchData(url, methodName = 'GET') {
@@ -41,6 +39,8 @@ async function fetchData(url, methodName = 'GET') {
 		method: methodName
 	})).json();
 }
+
+
 
 async function getAllUsers() {
 	// массив объектов
@@ -62,8 +62,9 @@ function createTR() {
 	td3.textContent = user.telNumber;
 	td4.innerHTML =
 		'<div class="action-buttons">' +
-		'<button class="btn delete-btn">Удалить</button>' +
+		'<button class="btn prolong-btn">Продлить</button>' +
 		'<button class="btn visit-btn">+</button>' +
+		'<button class="btn delete-btn">Удалить</button>' +
 		'</div>';
 	tr.appendChild(td1);
 	tr.appendChild(td2);
@@ -81,8 +82,6 @@ function showCreateCLientForm() {
 		'<button type="submit" class="btn sec-create-btn">Создать</button>' +
 		'</form>';
 }
-
-
 
 function backToMain() {
 	wrapper.innerHTML =
@@ -107,21 +106,27 @@ async function deleteUser(e) {
 	e.stopPropagation();
 	let clientID = getIdByActionButton(e);
 	// удаление
-	await fetchData(baseBackURL + clientID, 'DELETE');
+	await fetch(baseBackURL + clientID, { method: 'DELETE' });
+	window.location.reload();
 }
 
 async function visit(e) {
 	// не даст сработать событию click на tr
 	e.stopPropagation();
 	let clientID = getIdByActionButton(e);
-	await fetchData(baseBackURL + clientID + '/prolong=30', 'PUT');
+	await fetch(baseBackURL + clientID + '/visit', { method: 'PUT' });
+}
+
+async function prolong(e) {
+	e.stopPropagation();
+	let clientID = getIdByActionButton(e);
+	await fetch(baseBackURL + clientID + '/prolong=30', { method: 'PUT' });
 }
 
 async function showInfo(e) {
 	let clientID = getIdByTD(e);
 	console.log(await fetchData(baseBackURL + clientID));
 }
-
 
 /* 
 	Возвращет id пользователя, 

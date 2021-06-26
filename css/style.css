@@ -1,5 +1,5 @@
 body {
-  background: linear-gradient(135deg, #81f350 0%, #03fedb 100%);
+  background: linear-gradient(to right, #76d9ee 0%, #a0eafa 100%);
 }
 
 button {
@@ -44,9 +44,9 @@ table tr td {
   background: linear-gradient(36deg, #0dd3ff, #0389ff, #1c79c0);
   border-radius: 20px;
   padding: 5px;
-  border: 2px solid black;
-  transition: background-image 0.2s linear;
-  transition: transform 0.2s linear;
+  border: none;
+  box-shadow: 2px 2px #888888;
+  transition: all 0.2s linear;
   margin-left: 10px;
   color: white;
 }
@@ -56,6 +56,7 @@ table tr td {
 }
 
 .btn:hover {
+  box-shadow: none;
   cursor: pointer;
   background: linear-gradient(to right, #0069ff, #1633ff);
   transform: scale(1.05);
