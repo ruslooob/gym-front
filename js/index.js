@@ -120,12 +120,46 @@ async function visit(e) {
 async function prolong(e) {
 	e.stopPropagation();
 	let clientID = getIdByActionButton(e);
-	await fetch(baseBackURL + clientID + '/prolong=30', { method: 'PUT' });
+	console.log(baseBackURL + clientID + '/prolong/30');
+	await fetch(baseBackURL + clientID + '/prolong/30', { method: 'PUT' });
 }
 
 async function showInfo(e) {
+	let h1 = document.querySelector('h1');
+	h1.textContent = "Detailed Information"
+	let buttonsDiv = document.querySelector('.buttons');
+	buttonsDiv.remove();
+
 	let clientID = getIdByTD(e);
-	console.log(await fetchData(baseBackURL + clientID));
+	let json = await fetchData(baseBackURL + clientID);
+	tbody.innerHTML =
+		"<h2>Client Info</h2>" +
+		'<tr>' +
+		'<td>' + json.id + '</td>' +
+		'<td>' + json.fullName + '</td>' +
+		'<td>' + json.telNumber + '</td>' +
+		'</tr>';
+	let ths = document.querySelectorAll('th');
+	let actionTH = ths[ths.length - 1];
+	actionTH.remove();
+
+	wrapper.innerHTML +=
+		'<h2>SeasonTicket Info</h2>' +
+		'<table class="info-table">' +
+		'<thead>' +
+		'<th>Sessions Count</th>' +
+		'<th>Registrated</th>' +
+		'<th>End Date</th>' +
+		'</thead>' +
+		'<tbody>' +
+		'<tr>' +
+		'<td>' + json.sessionsCount + '</td>' +
+		'<td>' + json.seasonTicket.registeredDate + '</td>' +
+		'<td>' + json.seasonTicket.endDate + '</td>' +
+		'</tr>'
+	'</tbody>' +
+		'</table>';
+
 }
 
 /* 
