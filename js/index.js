@@ -1,3 +1,6 @@
+const PRICE_PER_DAY = 100;
+const DAYS_IN_YEAR = 365;
+
 const baseBackURL = 'http://localhost:8081/clients/';
 const baseFrontURL = 'http://localhost:5500';
 const tbody = document.querySelector('tbody');
@@ -9,7 +12,6 @@ createBtn.addEventListener('click', showCreateCLientForm);
 
 async function showAllUsers() {
 	let users = await getAllUsers();
-	console.log(users);
 	let i = 1;
 	for (user of users) {
 		let tr = createTR();
@@ -31,7 +33,7 @@ function initActionBtns() {
 	})
 	prolongBtns = document.querySelectorAll('.prolong-btn');
 	prolongBtns.forEach(btn => {
-		btn.addEventListener('click', prolong);
+		btn.addEventListener('click', showProlongForm);
 	})
 }
 
@@ -109,11 +111,58 @@ async function visit(e) {
 	await fetch(baseBackURL + clientID + '/visit', { method: 'PUT' });
 }
 
-async function prolong(e) {
+let clientID;
+
+async function showProlongForm(e) {
 	e.stopPropagation();
-	let clientID = getIdByActionButton(e);
-	console.log(baseBackURL + clientID + '/prolong/30');
-	await fetch(baseBackURL + clientID + '/prolong/30', { method: 'PUT' });
+	clientID = getIdByActionButton(e);
+	wrapper.innerHTML =
+		'<h2>Цена за 1 день - 100 руб</h2>' +
+		'<h2>Акция! Чем больше ходишь, тем больше скидка!</h2>' +
+		'<h3>Введите количество дней, и получите персональную скидку</h3>' +
+		'<input type="number" min="0"  step="100" name="daysCount" placeholder="Количество дней" class="prolong-input">' +
+		'<h3 class="total-price">Ваша Цена: </h3>' +
+		'<h3 class="discount">Ваша Скидка: </h3>' +
+		'<button class="btn prolong-btn">Заплатить</button>'
+	let prolongBtn = document.querySelector('.prolong-btn');
+	prolongBtn.addEventListener('click', prolong);
+	let prolongInput = document.querySelector('.prolong-input');
+	prolongInput.addEventListener('input', changeTotalPriceAndDiscount);
+}
+
+async function prolong() {
+	let prolongInput = document.querySelector('.prolong-input');
+
+	let daysCount = +prolongInput.value;
+	console.log(baseBackURL + clientID + '/prolong/' + daysCount);
+	await fetch(baseBackURL + clientID + '/prolong/' + daysCount, { method: 'PUT' });
+}
+
+
+async function getTotalPrice(daysCount) {
+	let clientInfoJSON = await fetchData(baseBackURL + clientID);
+	let sessionsCount = clientInfoJSON.sessionsCount;
+	let discount = ((sessionsCount) / (DAYS_IN_YEAR / 2)) * PRICE_PER_DAY;
+	let price = daysCount * PRICE_PER_DAY;
+	let totalPrice = price - (price * discount / 100);
+	return totalPrice;
+}
+
+async function getDiscount(daysCount) {
+	let clientInfoJSON = await fetchData(baseBackURL + clientID);
+	let sessionsCount = clientInfoJSON.sessionsCount;
+	let discount = ((sessionsCount) / (DAYS_IN_YEAR / 2)) * PRICE_PER_DAY;
+	return discount;
+}
+
+
+async function changeTotalPriceAndDiscount() {
+	let prolongInput = document.querySelector('.prolong-input');
+	let daysCount = +prolongInput.value;
+	let totalPrice = document.querySelector('.total-price');
+	let discount = document.querySelector('.discount');
+	totalPrice.textContent = 'Ваша Цена: ' + Math.round(await getTotalPrice(daysCount));
+	discount.textContent = 'Ваша Скидка: ' + Math.round(await getDiscount(daysCount)) + '%';
 }
 
 async function showInfo(e) {
