@@ -9,6 +9,7 @@ createBtn.addEventListener('click', showCreateCLientForm);
 
 async function showAllUsers() {
 	let users = await getAllUsers();
+	console.log(users);
 	let i = 1;
 	for (user of users) {
 		let tr = createTR();
@@ -55,12 +56,15 @@ function createTR() {
 	let td2 = document.createElement('td');
 	// telNumber
 	let td3 = document.createElement('td');
-	// actions
+	// email
 	let td4 = document.createElement('td');
+	// actions
+	let td5 = document.createElement('td');
 	td1.textContent = user.id;
 	td2.textContent = user.fullName;
 	td3.textContent = user.telNumber;
-	td4.innerHTML =
+	td4.textContent = user.email;
+	td5.innerHTML =
 		'<div class="action-buttons">' +
 		'<button class="btn prolong-btn">Продлить</button>' +
 		'<button class="btn visit-btn">+</button>' +
@@ -70,6 +74,7 @@ function createTR() {
 	tr.appendChild(td2);
 	tr.appendChild(td3);
 	tr.appendChild(td4);
+	tr.appendChild(td5);
 	return tr;
 }
 
@@ -79,26 +84,13 @@ function showCreateCLientForm() {
 		'<form action="http://localhost:8081/clients/" method="POST">' +
 		'<input type="text" name="fullName" autocomplete="off" class="full-name-input" placeholder="Полное имя">' +
 		'<input type="number" name="telNumber" autocomplete="off" class="tel-number-input" placeholder="Тел. номер">' +
-		'<button type="submit" class="btn sec-create-btn">Создать</button>' +
+		'<input type="email" name="email" autocomplete="off" placeholder="some@some.com" class="email-input">' +
+		'<button type="submit" class="btn sec-create-btn">Создать</button><br>' +
 		'</form>';
 }
 
 function backToMain() {
-	wrapper.innerHTML =
-		'<table>' +
-		'<thead>' +
-		'<th>ID</th>' +
-		'<th>Full Name</th>' +
-		'<th>Tel Number</th>' +
-		'<th>Action</th>' +
-		'</thead>' +
-		'<tbody>' +
-		'</tbody>' +
-		'</table>' +
-		'<div class="buttons">' +
-		'<button class="btn create-btn"><a>Создать</a></button>' +
-		'</div>'
-	showAllUsers();
+	window.location.href = baseFrontURL;
 }
 
 async function deleteUser(e) {
@@ -138,6 +130,7 @@ async function showInfo(e) {
 		'<td>' + json.id + '</td>' +
 		'<td>' + json.fullName + '</td>' +
 		'<td>' + json.telNumber + '</td>' +
+		'<td>' + json.email + '</td>' +
 		'</tr>';
 	let ths = document.querySelectorAll('th');
 	let actionTH = ths[ths.length - 1];
@@ -156,11 +149,21 @@ async function showInfo(e) {
 		'<td>' + json.sessionsCount + '</td>' +
 		'<td>' + json.seasonTicket.registeredDate + '</td>' +
 		'<td>' + json.seasonTicket.endDate + '</td>' +
-		'</tr>'
-	'</tbody>' +
-		'</table>';
+		'</tr>' +
+		'</tbody>' +
+		'</table>' +
+		'<div class="buttons">' +
+		'<button class="btn back-to-main-btn">На Главную</button>' +
+		'</div>';
+	initBackToMainBtn();
 
 }
+
+function initBackToMainBtn() {
+	let backToMainBtn = document.querySelector('.back-to-main-btn');
+	backToMainBtn.addEventListener('click', backToMain);
+}
+
 
 /* 
 	Возвращет id пользователя, 
