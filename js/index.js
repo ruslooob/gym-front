@@ -89,6 +89,7 @@ function showCreateCLientForm() {
 		'<input type="email" name="email" autocomplete="off" placeholder="some@some.com" class="email-input">' +
 		'<button type="submit" class="btn sec-create-btn">Создать</button><br>' +
 		'</form>';
+	document.querySelector('.btn-sec-create-btn').addEventListener('click', backToMain);
 }
 
 function backToMain() {
@@ -123,7 +124,10 @@ async function showProlongForm(e) {
 		'<input type="number" min="0"  step="100" name="daysCount" placeholder="Количество дней" class="prolong-input">' +
 		'<h3 class="total-price">Ваша Цена: </h3>' +
 		'<h3 class="discount">Ваша Скидка: </h3>' +
+		'<button class="btn back-to-main-btn">На Главную</button>' +
 		'<button class="btn prolong-btn">Заплатить</button>'
+	initBackToMainBtn();
+
 	let prolongBtn = document.querySelector('.prolong-btn');
 	prolongBtn.addEventListener('click', prolong);
 	let prolongInput = document.querySelector('.prolong-input');
@@ -136,6 +140,7 @@ async function prolong() {
 	let daysCount = +prolongInput.value;
 	console.log(baseBackURL + clientID + '/prolong/' + daysCount);
 	await fetch(baseBackURL + clientID + '/prolong/' + daysCount, { method: 'PUT' });
+	backToMain();
 }
 
 
