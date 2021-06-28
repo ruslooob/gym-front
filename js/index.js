@@ -8,7 +8,7 @@ const wrapper = document.querySelector('.wrapper');
 const createBtn = document.querySelector('.create-btn');
 
 document.addEventListener('DOMContentLoaded', showAllUsers);
-createBtn.addEventListener('click', showCreateCLientForm);
+createBtn.addEventListener('click', showCreateClientForm);
 
 async function showAllUsers() {
 	let users = await getAllUsers();
@@ -80,7 +80,7 @@ function createTR() {
 	return tr;
 }
 
-function showCreateCLientForm() {
+function showCreateClientForm() {
 	wrapper.innerHTML =
 		'<h1>Создание клиента</h1>' +
 		'<form action="http://localhost:8081/clients/" method="POST">' +
@@ -89,7 +89,11 @@ function showCreateCLientForm() {
 		'<input type="email" name="email" autocomplete="off" placeholder="some@some.com" class="email-input">' +
 		'<button type="submit" class="btn sec-create-btn">Создать</button><br>' +
 		'</form>';
-	document.querySelector('.btn-sec-create-btn').addEventListener('click', backToMain);
+	document.querySelector('.sec-create-btn').addEventListener('click', backToMain);
+}
+
+async function createUser() {
+	fetch(baseBackURL + clientID, { method: 'PUT' });
 }
 
 function backToMain() {
@@ -101,7 +105,7 @@ async function deleteUser(e) {
 	e.stopPropagation();
 	let clientID = getIdByActionButton(e);
 	// удаление
-	await fetch(baseBackURL + clientID, { method: 'DELETE' });
+	fetch(baseBackURL + clientID, { method: 'DELETE' });
 	window.location.reload();
 }
 
@@ -109,7 +113,7 @@ async function visit(e) {
 	// не даст сработать событию click на tr
 	e.stopPropagation();
 	let clientID = getIdByActionButton(e);
-	await fetch(baseBackURL + clientID + '/visit', { method: 'PUT' });
+	fetch(baseBackURL + clientID + '/visit', { method: 'PUT' });
 }
 
 let clientID;
