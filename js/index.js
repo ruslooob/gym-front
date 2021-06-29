@@ -1,4 +1,4 @@
-const PRICE_PER_DAY = 100;
+
 const DAYS_IN_YEAR = 365;
 
 const baseBackURL = 'http://localhost:8081/clients/';
@@ -83,17 +83,42 @@ function createTR() {
 function showCreateClientForm() {
 	wrapper.innerHTML =
 		'<h1>Создание клиента</h1>' +
-		'<form action="http://localhost:8081/clients/" method="POST">' +
+		// '<form action="http://localhost:8081/clients/" method="POST">' +
 		'<input type="text" name="fullName" autocomplete="off" class="full-name-input" placeholder="Полное имя">' +
 		'<input type="number" name="telNumber" autocomplete="off" class="tel-number-input" placeholder="Тел. номер">' +
 		'<input type="email" name="email" autocomplete="off" placeholder="some@some.com" class="email-input">' +
-		'<button type="submit" class="btn sec-create-btn">Создать</button><br>' +
-		'</form>';
-	document.querySelector('.sec-create-btn').addEventListener('click', backToMain);
+		'<button class="btn sec-create-btn">Создать</button><br>'
+	// '</form>';
+
+	let secCreateBtn = document.querySelector('.sec-create-btn');
+
+	secCreateBtn.addEventListener('click', createUser);
+	secCreateBtn.addEventListener('click', backToMain);
 }
 
 async function createUser() {
-	fetch(baseBackURL + clientID, { method: 'PUT' });
+	let userFullName = document.querySelector('.full-name-input').value;
+	let userTelNumber = document.querySelector('.tel-number-input').value;
+	let userEmail = document.querySelector('.email-input').value;
+
+	let userData = {
+		fullName: userFullName,
+		telNumber: userTelNumber,
+		email: userEmail
+	}
+
+	let url = 'http://localhost:8081/clients/';
+
+	const options = {
+		method: 'POST',
+		headers: {
+			'content-type': 'application/json'
+		},
+		data: JSON.stringify(userData),
+		url
+	}
+
+	await axios(options);
 }
 
 function backToMain() {
@@ -105,7 +130,7 @@ async function deleteUser(e) {
 	e.stopPropagation();
 	let clientID = getIdByActionButton(e);
 	// удаление
-	fetch(baseBackURL + clientID, { method: 'DELETE' });
+	await fetch(baseBackURL + clientID, { method: 'DELETE' });
 	window.location.reload();
 }
 
@@ -116,13 +141,20 @@ async function visit(e) {
 	fetch(baseBackURL + clientID + '/visit', { method: 'PUT' });
 }
 
+async function getPricePerDay() {
+	return (await axios.get(baseBackURL + 'price-per-day')).data;
+}
+
+
 let clientID;
 
 async function showProlongForm(e) {
 	e.stopPropagation();
 	clientID = getIdByActionButton(e);
+	const PRICE_PER_DAY = await getPricePerDay();
+
 	wrapper.innerHTML =
-		'<h2>Цена за 1 день - 100 руб</h2>' +
+		'<h2>Цена за 1 день - ' + PRICE_PER_DAY + ' руб</h2>' +
 		'<h2>Акция! Чем больше ходишь, тем больше скидка!</h2>' +
 		'<h3>Введите количество дней, и получите персональную скидку</h3>' +
 		'<input type="number" min="0"  step="100" name="daysCount" placeholder="Количество дней" class="prolong-input">' +
@@ -134,8 +166,16 @@ async function showProlongForm(e) {
 
 	let prolongBtn = document.querySelector('.prolong-btn');
 	prolongBtn.addEventListener('click', prolong);
+
 	let prolongInput = document.querySelector('.prolong-input');
-	prolongInput.addEventListener('input', changeTotalPriceAndDiscount);
+	prolongInput.addEventListener('input', changeTotalPrice);
+
+
+	let discount = document.querySelector('.discount');
+	let discountValue = await getDiscount();
+
+	discount.textContent = 'Ваша Скидка: ' + discountValue + '%';
+
 }
 
 async function prolong() {
@@ -147,31 +187,29 @@ async function prolong() {
 	backToMain();
 }
 
-
-async function getTotalPrice(daysCount) {
-	let clientInfoJSON = await fetchData(baseBackURL + clientID);
-	let sessionsCount = clientInfoJSON.sessionsCount;
-	let discount = ((sessionsCount) / (DAYS_IN_YEAR / 2)) * PRICE_PER_DAY;
+async function getFullPrice() {
+	const PRICE_PER_DAY = await getPricePerDay();
+	let prolongInput = document.querySelector('.prolong-input');
+	let daysCount = +prolongInput.value;
 	let price = daysCount * PRICE_PER_DAY;
-	let totalPrice = price - (price * discount / 100);
-	return totalPrice;
+	return price;
 }
 
+
 async function getDiscount(daysCount) {
-	let clientInfoJSON = await fetchData(baseBackURL + clientID);
-	let sessionsCount = clientInfoJSON.sessionsCount;
-	let discount = ((sessionsCount) / (DAYS_IN_YEAR / 2)) * PRICE_PER_DAY;
+	let url = baseBackURL + clientID + '/discount';
+	let discount = Math.round((await axios.get(url)).data);
 	return discount;
 }
 
 
-async function changeTotalPriceAndDiscount() {
-	let prolongInput = document.querySelector('.prolong-input');
-	let daysCount = +prolongInput.value;
+async function changeTotalPrice() {
+	let discount = await getDiscount();
 	let totalPrice = document.querySelector('.total-price');
-	let discount = document.querySelector('.discount');
-	totalPrice.textContent = 'Ваша Цена: ' + Math.round(await getTotalPrice(daysCount));
-	discount.textContent = 'Ваша Скидка: ' + Math.round(await getDiscount(daysCount)) + '%';
+	let fullPrice = await getFullPrice();
+	console.log(fullPrice);
+	let totalPriceValue = fullPrice - (fullPrice * (discount / 100));
+	totalPrice.textContent = 'Ваша Цена: ' + totalPriceValue;
 }
 
 async function showInfo(e) {
