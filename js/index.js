@@ -1,4 +1,3 @@
-
 const DAYS_IN_YEAR = 365;
 
 const baseBackURL = 'http://localhost:8081/clients/';
@@ -9,6 +8,7 @@ const createBtn = document.querySelector('.create-btn');
 
 document.addEventListener('DOMContentLoaded', showAllUsers);
 createBtn.addEventListener('click', showCreateClientForm);
+
 
 async function showAllUsers() {
 	let users = await getAllUsers();
@@ -42,8 +42,6 @@ async function fetchData(url, methodName = 'GET') {
 		method: methodName
 	})).json();
 }
-
-
 
 async function getAllUsers() {
 	// массив объектов
@@ -131,7 +129,7 @@ async function deleteUser(e) {
 	let clientID = getIdByActionButton(e);
 	// удаление
 	await fetch(baseBackURL + clientID, { method: 'DELETE' });
-	window.location.reload();
+	backToMain();
 }
 
 async function visit(e) {
@@ -181,9 +179,22 @@ async function showProlongForm(e) {
 async function prolong() {
 	let prolongInput = document.querySelector('.prolong-input');
 
-	let daysCount = +prolongInput.value;
-	console.log(baseBackURL + clientID + '/prolong/' + daysCount);
-	await fetch(baseBackURL + clientID + '/prolong/' + daysCount, { method: 'PUT' });
+	let userDaysCount = +prolongInput.value;
+
+	userData = {
+		daysCount: userDaysCount
+	};
+	let url = baseBackURL + clientID + '/season-ticket';
+	const options = {
+		method: 'PUT',
+		headers: {
+			'content-type': 'application/json'
+		},
+		data: JSON.stringify(userData),
+		url
+	}
+
+	await axios(options);
 	backToMain();
 }
 
@@ -202,12 +213,10 @@ async function getDiscount(daysCount) {
 	return discount;
 }
 
-
 async function changeTotalPrice() {
 	let discount = await getDiscount();
 	let totalPrice = document.querySelector('.total-price');
 	let fullPrice = await getFullPrice();
-	console.log(fullPrice);
 	let totalPriceValue = fullPrice - (fullPrice * (discount / 100));
 	totalPrice.textContent = 'Ваша Цена: ' + totalPriceValue;
 }
@@ -246,6 +255,8 @@ async function showInfo(e) {
 		'<td>' + json.seasonTicket.registeredDate + '</td>' +
 		'<td>' + json.seasonTicket.endDate + '</td>' +
 		'</tr>' +
+		'<h2>Visit Dates</h2>' +
+		json.visitDates +
 		'</tbody>' +
 		'</table>' +
 		'<div class="buttons">' +
@@ -259,7 +270,6 @@ function initBackToMainBtn() {
 	let backToMainBtn = document.querySelector('.back-to-main-btn');
 	backToMainBtn.addEventListener('click', backToMain);
 }
-
 
 /* 
 	Возвращет id пользователя, 
